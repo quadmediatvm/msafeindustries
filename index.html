@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0GN457MHNJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-0GN457MHNJ');
+</script>
+
+<link rel="icon" type="image/png" href="https://github.com/msafeindustries/MSAFE/blob/main/images/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="https://github.com/msafeindustries/MSAFE/blob/main/images/favicon.svg" />
+<link rel="shortcut icon" href="https://github.com/msafeindustries/MSAFE/blob/main/images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="https://github.com/msafeindustries/MSAFE/blob/main/images/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+<link rel="manifest" href="https://github.com/msafeindustries/MSAFE/blob/main/images/site.webmanifest" />
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSAFE | AQUARUN Automatic Water Level Controller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+        :root {
+            --msafe-red: #ff0000;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --accent-glow: rgba(255, 0, 0, 0.4);
+        }
+/* Container that holds your content */
+.main-wrapper {
+  display: flex;
+  flex-wrap: wrap; /* Allows items to drop to the next line */
+  padding: 20px;
+}
+
+/* Items take up 100% width on mobile by default */
+.content-box {
+  flex: 1 1 100%; 
+  padding: 10px;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap; /* This allows items to drop to the next line on mobile */
+}
+/* Default styles (Mobile) */
+.sidebar {
+  display: none; /* Hide sidebar on phones to save space */
+}
+
+/* Tablet and Desktop (Screens wider than 768px) */
+@media (min-width: 768px) {
+  .sidebar {
+    display: block;
+    width: 25%;
+  }
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+/* Animation Base States */
+.reveal-left { transform: translateX(-50px); transition: all 1s ease-out; }
+.reveal-right { transform: translateX(50px); transition: all 1s ease-out; }
+.reveal-card { transform: translateY(30px); transition: all 0.6s ease-out; }
+
+/* Active States (Triggered by JS) */
+.active {
+    opacity: 1 !important;
+    transform: translate(0) !important;
+}
+
+/* Float & Spin (Your existing animations) */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+/* 1. The Container: Allow items to wrap to a new line */
+.image-container {
+  display: flex;
+  flex-wrap: wrap;      /* Crucial: lets images drop to the next row */
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+}
+
+/* 2. The Images: Make them fluid */
+.image-container img {
+  flex: 1 1 300px;      /* Grow to fill space, shrink if needed, 300px base */
+  max-width: 100%;      /* Never get wider than the screen */
+  height: auto;         /* Keep the aspect ratio perfect */
+  object-fit: cover;    /* Crops slightly to keep them uniform if they differ */
+}
+/* On screens wider than 768px (Tablets/Laptops), switch to side-by-side */
+@media (min-width: 768px) {
+  .content-box {
+    flex: 1; /* Items will share the space equally in one row */
+  }
+}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark-bg); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--msafe-red); }
+
+        .glass-nav {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 0, 0, 0.15) 0%, transparent 60%);
+            transition: background 0.1s ease;
+        }
+
+        .red-glow {
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .spec-card {
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spec-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,0,0,0.05), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+
+        .spec-card:hover::before { transform: translateX(100%); }
+
+        .spec-card:hover {
+            border-color: rgba(255, 0, 0, 0.3);
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .floating-product {
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 50px rgba(255,0,0,0.2));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(1deg); }
+        }
+
+        .btn-primary {
+            background-color: var(--msafe-red);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 300%; height: 300%;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.5s ease;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::after { transform: translate(-50%, -50%) scale(1); }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
+            letter-spacing: 1px;
+        }
+
+        .logo-img {
+            max-height: 40px;
+            filter: drop-shadow(0 0 8px rgba(255,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-img:hover { transform: scale(1.05); }
+
+        /* Text Reveal Animation */
+        .reveal-text {
+            background: linear-gradient(to right, #fff 50%, #444 50%);
+            background-size: 200% 100%;
+            background-position: 100% 0;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: all 1.5s ease;
+        }
+        
+        .is-visible .reveal-text { background-position: 0 0; }
+
+        /* Interactive Map/Contact Card */
+        .contact-card {
+            background: linear-gradient(145deg, #161616, #0d0d0d);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .image-container {
+    display: flex;
+    justify-content: space-around; /* Distributes space evenly */
+    align-items: center;          /* Centers images vertically */
+    border: 5px solid #000000;       /* The outer frame border */
+    padding: 10px;
+    background-color: #000000;
+    gap: 10px;                    /* Space between the images */
+  }
+
+  /* Ensuring images fit properly */
+  .image-container img {
+    max-width: 30%;               /* Adjusts size to fit 3 in a row */
+    height: auto;
+    border: 2px solid #000000;       /* Individual borders for style */
+  }
+  @media (max-width: 600px) {
+  .image-container {
+    flex-direction: column;
+  }
+  .image-container img {
+    max-width: 100%;
+  }
+}
+
+    </style>
+    <style>
+    /* Status Colors */
+    .status-open { color: #22c55e; }
+    .status-closed { color: #dc2626; }
+    
+    .bg-open { background-color: #22c55e; }
+    .bg-closed { background-color: #dc2626; }
+    
+    /* Animation Helpers */
+    .reveal-left { opacity: 0; transform: translateX(-50px); transition: all 1s ease-out; }
+    .reveal-right { opacity: 0; transform: translateX(50px); transition: all 1s ease-out; }
+    .reveal-left.active, .reveal-right.active { opacity: 1; transform: translateX(0); }
+    /* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #dc2626; /* red-600 */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ef4444; /* red-500 */
+}
+/* Preloader Specific Styles */
+#preloader.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#loader-bar {
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.8);
+    transition: width 2s linear; /* Matches the 2s requirement */
+}
+
+@keyframes aura-pulse {
+    0%, 100% { opacity: 0.1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.1); }
+}
+
+.animate-aura {
+    animation: aura-pulse 4s infinite ease-in-out;
+    background: radial-gradient(circle, rgba(220,38,38,0.15) 0%, rgba(0,0,0,0) 70%);
+}
+</style>
+
+<script>
+function updateStatus() {
+    const now = new Date();
+    // Adjusting for IST (if your server/user is elsewhere, you can force UTC+5.5)
+    const hours = now.getHours();
+    const day = now.getDay(); // 0 = Sunday, 1-6 = Mon-Sat
+    
+    const statusText = document.getElementById('status-text');
+    const statusDot = document.getElementById('status-dot');
+    const ping = document.getElementById('ping-effect');
+    const glow = document.getElementById('glow-bg');
+    const timeDisplay = document.getElementById('current-time');
+    const cardBorder = document.getElementById('status-card');
+
+    // Display Current Time
+    timeDisplay.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // OPEN: Mon-Sat (1-6) AND 10:00 to 17:59 (18:00)
+    const isOpen = (day >= 1 && day <= 6) && (hours >= 10 && hours < 18);
+
+    if (isOpen) {
+        statusText.innerText = "Shop is Open";
+        statusText.className = "text-3xl font-black italic tracking-tighter uppercase block text-green-500";
+        statusDot.className = "relative inline-flex rounded-full h-5 w-5 bg-green-500";
+        ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
+        glow.style.backgroundColor = "rgba(34, 197, 94, 0.2)";
+        cardBorder.style.background = "linear-gradient(to right, #22c55e, transparent)";
+    } else {
+        statusText.innerText = "Shop is Closed";
+        statusText.className = "text-3xl font-black italic tracking-tighter uppercase block text-red-600";
+        statusDot.className = "relative inline-flex rounded-full h-5 w-5 bg-red-600";
+        ping.className = "hidden"; // No ping when closed
+        glow.style.backgroundColor = "rgba(220, 38, 38, 0.1)";
+        cardBorder.style.background = "linear-gradient(to right, #dc2626, transparent)";
+    }
+}
+
+// Scroll Animation Trigger
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.reveal-left, .reveal-right').forEach(el => el.classList.add('active'));
+        }
+    });
+}, { threshold: 0.1 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateStatus();
+    setInterval(updateStatus, 60000); // Update every minute
+    observer.observe(document.querySelector('#hours'));
+});
+</script>
+    <style>
+    /* 1. Base states: Hidden and moved slightly */
+    .reveal-left, .reveal-right, .reveal-card {
+        opacity: 0;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform, opacity;
+    }
+    
+    .reveal-left { transform: translateX(-30px); }
+    .reveal-right { transform: translateX(30px); }
+    .reveal-card { transform: translateY(30px); }
+
+    /* 2. The 'active' class that makes them visible */
+    .reveal-left.active, 
+    .reveal-right.active, 
+    .reveal-card.active {
+        opacity: 1 !important;
+        transform: translate(0, 0) !important;
+    }
+
+    /* 3. Your existing animations */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Intersection Observer Logic
+    const observerOptions = {
+        threshold: 0.1, // Trigger when 10% is visible
+        rootMargin: "0px 0px -50px 0px" // Trigger slightly before it hits the viewport
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Animate Headings/Images
+                const mainElements = entry.target.querySelectorAll('.reveal-left, .reveal-right');
+                mainElements.forEach(el => el.classList.add('active'));
+
+                // Animate Cards with Delay
+                const cards = entry.target.querySelectorAll('.reveal-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('active');
+                    }, index * 100); 
+                });
+                
+                // Once animated, stop observing this section
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe both sections
+    const sections = document.querySelectorAll('#contact, #hours');
+    sections.forEach(sec => {
+        if(sec) observer.observe(sec);
+    });
+});
+</script>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const observerOptions = { threshold: 0.2 };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Animate main containers
+                entry.target.querySelectorAll('.reveal-left, .reveal-right').forEach(el => {
+                    el.classList.add('active');
+                });
+
+                // Animate cards with a staggered delay
+                entry.target.querySelectorAll('.reveal-card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('active');
+                    }, index * 150); // 150ms delay between each card
+                });
+            }
+        });
+    }, observerOptions);
+
+    observer.observe(document.querySelector('#contact'));
+});
+</script>
+</head>
+<body class="selection:bg-red-600 selection:text-white">
+    <div id="preloader" class="fixed inset-0 z-[100] bg-[#000] flex flex-col items-center justify-center transition-opacity duration-1000">
+    <div class="absolute inset-0 bg-radial-gradient from-red-900/10 to-transparent opacity-30 animate-aura"></div>
+    
+    <div class="relative z-10 flex flex-col items-center">
+        <h1 class="text-4xl font-black italic tracking-[0.5em] text-red-600 mb-6">MSAFE</h1>
+        
+        <div class="w-64 h-[2px] bg-white/10 rounded-full overflow-hidden">
+            <div id="loader-bar" class="h-full bg-red-600 w-0"></div>
+        </div>
+    </div>
+</div>
+<div class="custom-cursor"></div>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="images\logo.png" alt="MSAFE Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/150x50?text=MSAFE'">
+            </div>
+            <div class="hidden md:flex space-x-10 text-xs font-bold uppercase tracking-[0.2em]">
+                <a href="#home" class="hover:text-red-500 transition relative group">
+                    Home
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#features" class="hover:text-red-500 transition relative group">
+                    Features
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#specifications" class="hover:text-red-500 transition relative group">
+                    Specs
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#photo" class="hover:text-red-500 transition relative group">
+                    Photo Section
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#buy-now" class="hover:text-red-500 transition relative group">
+                    Buy Now
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                </a>
+                <a href="#contact" class="hover:text-red-500 transition relative group">
+                    Contact
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                </a>
+                
+            </div>
+            
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div class="hero-gradient absolute inset-0 z-0"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="animate-on-scroll">
+                <h2 class="text-red-600 font-bold tracking-[0.3em] text-sm mb-4 uppercase">The Future of Automation</h2>
+                <h1 class="text-6xl md:text-8xl font-black mb-6 leading-[0.9] reveal-text">
+                    AQUARUN
+                </h1>
+                <p class="text-gray-400 text-lg mb-10 max-w-lg font-light leading-relaxed">
+                    Precision-engineered water management for high-altitude demands. Smart sensing meets uncompromising safety.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#specifications" class="btn-primary px-10 py-5 rounded-xl font-black text-sm uppercase tracking-wider">Explore Tech</a>
+                    
+                </div>
+            </div>
+            
+            <div class="relative flex justify-center animate-on-scroll delay-300">
+                <div class="absolute inset-0 bg-red-600/5 blur-[120px] rounded-full scale-150"></div>
+               <img src="images\MSAFENOBG.png" alt="Description of my image"class="floating-product w-full max-w-md relative z-10">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-32 bg-[#050505]">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-20 animate-on-scroll">
+                <h2 class="text-5xl font-black mb-6 italic">Core Systems</h2>
+                <div class="w-32 h-2 bg-red-600"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-10">
+                <!-- Feature 1 -->
+                <div class="spec-card p-10 rounded-[2.5rem] bg-[#0d0d0d] animate-on-scroll">
+                    <div class="w-20 h-20 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 border border-red-600/20">
+                        <i class="fas fa-bolt text-red-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4">Voltage Management</h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">Dynamic voltage monitoring that protects the heart of your plumbing against electrical surges and drops.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="spec-card p-10 rounded-[2.5rem] bg-[#0d0d0d] animate-on-scroll" style="transition-delay: 150ms">
+                    <div class="w-20 h-20 bg-blue-600/10 rounded-2xl flex items-center justify-center mb-8 border border-blue-600/20">
+                        <i class="fas fa-microchip text-blue-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4">DrySensing</h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">High precision sensors that detect zero-flow conditions instantly, preventing pump burnout and saving energy.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="spec-card p-10 rounded-[2.5rem] bg-[#0d0d0d] animate-on-scroll" style="transition-delay: 300ms">
+                    <div class="w-20 h-20 bg-yellow-600/10 rounded-2xl flex items-center justify-center mb-8 border border-yellow-600/20">
+                        <i class="fas fa-water text-yellow-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4">Magnetic Float Technology</h3>
+                    <p class="text-gray-500 font-medium leading-relaxed">Precision-tuned magnetic floats designed for life-long corrosion resistance and maintenance-free operation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spec Showcase Section -->
+    <section class="py-32 relative">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
+            <div class="order-2 md:order-1 animate-on-scroll">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-transparent rounded-3xl blur opacity-0 group-hover:opacity-50 transition duration-1000"></div>
+                    <img src="images\all.png" class="relative rounded-3xl border border-white/5 " alt="Detail View" onerror="this.style.display='none'">
+                </div>
+            </div>
+            <div class="order-1 md:order-2 space-y-8 animate-on-scroll">
+                <span class="text-red-600 font-black tracking-widest text-xs uppercase">Quality Control</span>
+                <h2 class="text-5xl font-black leading-tight">Engineered to <br>Last a Lifetime</h2>
+                <p class="text-gray-400 text-xl leading-relaxed font-light">
+                    Every AQUARUN unit undergoes a 48-hour stress test before leaving our facility, ensuring that "MSAFE" isn't just a name, but a promise of security.
+                </p>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="p-6 bg-white/5 rounded-2xl">
+                        <div class="text-3xl font-black text-red-600 mb-1">1YR</div>
+                        <div class="text-xs font-bold uppercase tracking-tighter text-gray-500">Full Warranty</div>
+                    </div>
+                    <div class="p-6 bg-white/5 rounded-2xl">
+                        <div class="text-3xl font-black text-red-600 mb-1">48H</div>
+                        <div class="text-xs font-bold uppercase tracking-tighter text-gray-500">Stress Tested</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specifications List -->
+    <section id="specifications" class="py-32 bg-zinc-950">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-20 animate-on-scroll">
+                <h2 class="text-5xl font-black mb-4 italic">Details About Aquarun</h2>
+                <p class="text-gray-500 tracking-widest uppercase text-xs">Technical Performance Metrics</p>
+            </div>
+
+            <div class="grid gap-4 animate-on-scroll">
+                
+                <div class="group flex items-center justify-between p-8 bg-[#111] hover:bg-red-600/5 transition rounded-3xl border border-white/5">
+                    <span class="text-gray-500 group-hover:text-white transition font-bold uppercase text-xs tracking-widest">Input Voltage</span>
+                    <span class="text-xl font-black">230V AC, 50Hz, Single Phase</span>
+                </div>
+                <div class="group flex items-center justify-between p-8 bg-[#111] hover:bg-red-600/5 transition rounded-3xl border border-white/5">
+                    <span class="text-gray-500 group-hover:text-white transition font-bold uppercase text-xs tracking-widest">Relay Capacity</span>
+                    <span class="text-xl font-black">Up to 1.5 HP</span>
+                </div>
+                <div class="group flex items-center justify-between p-8 bg-[#111] hover:bg-red-600/5 transition rounded-3xl border border-white/5">
+                    <span class="text-gray-500 group-hover:text-white transition font-bold uppercase text-xs tracking-widest">Sensor Technology</span>
+                    <span class="text-xl font-black">Magnetic Floats</span>
+                </div>
+            </div>
+        </div>
+    </section>
+ <!-- PHOTO Section -->
+   <section id="photo" class="py-32 relative overflow-hidden"></section>
+    <div class="text-center mb-20 animate-on-scroll">
+                <h2 class="text-5xl font-black mb-4 italic">PHOTO SECTION</h2>
+            </div>
+   <center> <img src="images\ai.png"class="relative rounded-3xl border border-white/5 " alt="Detail View" onerror="this.style.display='none'"> 
+ </div>
+ <div class="image-container">
+  <img src="images\postt.jpg" alt="Image 1">
+  <img src="images\post.jpg" alt="Image 2">
+  <img src="images\1.png" alt="Image 3">
+  <img src="images\2.png" alt="Image 3">
+  <img src="images\3.png" alt="Image 3">
+  <img src="images\6.jpg" alt="Image 3">
+  <img src="images\9.png" alt="Image 3">
+  <img src="images\11.jpg" alt="Image 3">
+  <img src="images\14.jpg" alt="Image 3">
+  <img src="images\e.jpg" alt="Image 3">
+  <img src="images\ORANGE.png" alt="Image 3">
+  
+</div>
+
+    </center>
+<!-- Order Now -->
+    <section id="buy-now" class="py-32 bg-[#080808] relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-red-600 font-bold tracking-[0.3em] text-sm mb-4 uppercase">Ready to Automate?</h2>
+                <h2 class="text-5xl font-black italic">ORDER ONLINE</h2>
+                <div class="w-24 h-1 bg-red-600 mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="spec-card p-10 rounded-[2.5rem] bg-[#111] border border-white/5 flex flex-col items-center text-center animate-on-scroll">
+                    <div class="w-20 h-20 mb-6 flex items-center justify-center bg-white/5 rounded-2xl">
+                        <i class="fab fa-amazon text-4xl text-[#FF9900]"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-2">Amazon</h3>
+                    <p class="text-gray-500 mb-8 text-sm">Fast delivery and secure payments via Amazon India.</p>
+                    <a href= "https://amzn.in/d/04q9t42u" target="_blank" class="btn-primary w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3">
+                        Order on Amazon <i class="fas fa-external-link-alt text-[10px]"></i>
+                    </a>
+                </div>
+
+                <div class="spec-card p-10 rounded-[2.5rem] bg-[#111] border border-white/5 flex flex-col items-center text-center animate-on-scroll" style="transition-delay: 200ms">
+                    <div class="w-20 h-20 mb-6 flex items-center justify-center bg-white/5 rounded-2xl">
+                        <img src="images\flipkart-icon.svg" class="w-10 h-10" alt="Flipkart">
+                    </div>
+                    <h3 class="text-2xl font-black mb-2">Flipkart</h3>
+                    <p class="text-gray-500 mb-8 text-sm">Fast delivery and secure payments via Flipkart.</p>
+                    <a href="https://www.flipkart.com/msafe-aquarun-sp-wired-sensor-security-system/p/itm3d5223d856771?pid=SSSHC7SPAZDGSZHJ&lid=LSTSSSHC7SPAZDGSZHJNDH6BN&marketplace=FLIPKART&fm=factBasedRecommendation%2FrecentlyViewed&iid=R%3Arv%3Bpt%3App%3Buid%3Ac32deaf3-00db-11f1-b122-fd50256dc852%3B.SSSHC7SPAZDGSZHJ&ppt=pp&ppn=pp&ssid=sfbefvy9z40000001770107909016&otracker=pp_reco_Recently%2BViewed_1_40.productCard.RECENTLY_VIEWED_MSafe%2BAQUARUN%2BSP%2BWired%2BSensor%2BSecurity%2BSystem_SSSHC7SPAZDGSZHJ_factBasedRecommendation%2FrecentlyViewed_0&otracker1=pp_reco_PINNED_factBasedRecommendation%2FrecentlyViewed_Recently%2BViewed_DESKTOP_HORIZONTAL_productCard_cc_1_NA_view-all&cid=SSSHC7SPAZDGSZHJ" target="_blank" class="btn-primary w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3" style="background-color: #2874f0;">
+                        Order on Flipkart <i class="fas fa-external-link-alt text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+     <!-- problem we solve -->
+<section id="problem" class="py-32 bg-[#0a0a0a]">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-20 animate-on-scroll">
+            <h2 class="text-5xl font-black italic">SMART VS. <span class="text-red-600">TRADITIONAL</span></h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-0 rounded-[3rem] overflow-hidden border border-white/5 shadow-2xl">
+            <div class="p-12 bg-neutral-900/50 relative group">
+                <div class="absolute top-8 right-8 text-red-600/20 text-6xl font-black italic">OLD</div>
+                <h4 class="text-2xl font-black mb-10 uppercase tracking-tighter">Manual Management</h4>
+                <ul class="space-y-6">
+                    <li class="flex items-center gap-4 text-gray-500 line-through decoration-red-600/50"><i class="fas fa-times-circle text-red-600"></i> Constant tank monitoring</li>
+                    <li class="flex items-center gap-4 text-gray-500 line-through decoration-red-600/50"><i class="fas fa-times-circle text-red-600"></i> Risk of pump dry-running</li>
+                    <li class="flex items-center gap-4 text-gray-500 line-through decoration-red-600/50"><i class="fas fa-times-circle text-red-600"></i> Wasted water from overflows</li>
+                </ul>
+            </div>
+
+            <div class="p-12 bg-red-600 relative group">
+                <div class="absolute top-8 right-8 text-white/20 text-6xl font-black italic">NEW</div>
+                <h4 class="text-2xl font-black mb-10 uppercase tracking-tighter text-white">AQUARUN Solution</h4>
+                <ul class="space-y-6">
+                    <li class="flex items-center gap-4 text-white font-bold"><i class="fas fa-check-circle text-white shadow-lg"></i> Set it and forget it</li>
+                    <li class="flex items-center gap-4 text-white font-bold"><i class="fas fa-check-circle text-white shadow-lg"></i> AI-driven dry-run safety</li>
+                    <li class="flex items-center gap-4 text-white font-bold"><i class="fas fa-check-circle text-white shadow-lg"></i> 100% Zero-Overflow guarantee</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-[#050505] text-white overflow-hidden relative">
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-red-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-red-900/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid lg:grid-cols-12 gap-16 items-center">
+            
+            <div class="lg:col-span-7 order-2 lg:order-1 reveal-left opacity-0">
+                <div class="mb-12">
+                    <h2 class="text-sm font-black uppercase tracking-[0.4em] text-red-600 mb-4">Connection Hub</h2>
+                    <h3 class="text-5xl md:text-7xl font-black italic leading-none">LET'S FUEL <br> THE <span class="text-red-600 underline decoration-red-600/30 underline-offset-8">RUN</span></h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                    <a href="tel:+919037627335" class="reveal-card opacity-0 group p-8 rounded-[2.5rem] bg-white/5 border border-white/10 hover:bg-red-600 transition-all duration-500 hover:-translate-y-2">
+                        <div class="flex flex-col h-full">
+                            <i class="fa-solid fa-phone text-3xl mb-12 group-hover:rotate-12 transition-transform"></i>
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-white/80">Call Center</p>
+                            <p class="text-xl font-black">+91 90376 27335</p>
+                        </div>
+                    </a>
+
+                    <a href="https://wa.me/919037627335" class="reveal-card opacity-0 group p-8 rounded-[2.5rem] bg-white/5 border border-white/10 hover:bg-[#25D366] transition-all duration-500 hover:-translate-y-2">
+                        <div class="flex flex-col h-full">
+                            <i class="fab fa-whatsapp text-3xl mb-12 group-hover:scale-110 transition-transform"></i>
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-white/80">Direct Message</p>
+                            <p class="text-xl font-black">WhatsApp</p>
+                        </div>
+                    </a>
+
+                    <a href="https://www.instagram.com/msafeindustries/" class="reveal-card opacity-0 group p-8 rounded-[2.5rem] bg-white/5 border border-white/10 hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] transition-all duration-500 hover:-translate-y-2">
+                        <div class="flex flex-col h-full">
+                            <i class="fab fa-instagram text-3xl mb-12 group-hover:-rotate-12 transition-transform"></i>
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-white/80">Follow Us</p>
+                            <p class="text-xl font-black">@msafeindustries</p>
+                        </div>
+                    </a>
+
+                    <div class="reveal-card opacity-0 group p-8 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-blue-500 transition-all duration-500 hover:-translate-y-2">
+                        <a href="https://maps.app.goo.gl/ryCFCHcGkyvpJKkx5">
+    <div class="flex flex-col h-full">
+        <i class="fas fa-map-marker-alt text-3xl mb-12 text-blue-500 group-hover:animate-bounce"></i>
+        <p class="text-xs font-bold uppercase tracking-widest text-gray-400">Headquarters</p>
+        <p class="text-xl font-black">Kerala, India</p>
+    </div>
+</a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 order-1 lg:order-2 flex justify-center lg:justify-end reveal-right opacity-0">
+                <div class="relative group">
+                    <div class="absolute inset-0 rounded-full border-2 border-dashed border-red-600/20 animate-[spin_20s_linear_infinite] group-hover:border-red-600/50 transition-colors"></div>
+                    <div class="relative p-4 animate-[bounce_4s_ease-in-out_infinite]">
+                        <img src="images/MSAFENOBG.png" alt="Msafe Logo" class="max-w-[280px] md:max-w-[400px] drop-shadow-[0_0_50px_rgba(220,38,38,0.3)] filter brightness-110">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="reveal-card opacity-0 sm:col-span-2 group p-2 rounded-[2.5rem] bg-white/5 border border-white/10 overflow-hidden mt-6">
+    <div class="relative h-64 w-full rounded-[2rem] overflow-hidden">
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126047.123456789!2d76.58!3d8.89!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05fd30360ca4d1%3A0x19932646d65451e0!2sKollam%2C%20Kerala!5e0!3m2!1sen!2sin!4v1715000000000" 
+            class="w-full h-full "
+            style="border:0;" allowfullscreen="" >
+        </iframe>
+        
+        <div class="absolute bottom-6 right-6">
+            <a href="https://maps.app.goo.gl/ryCFCHcGkyvpJKkx5" target="_blank" class="btn-primary px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-2xl">
+                <i class="fas fa-location-arrow"></i>
+                Open in Maps
+            </a>
+        </div>
+    </div>
+    <div class="p-6">
+        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Regional Presence</p>
+        <p class="text-lg font-black text-white">HEAD Quarters— Kerala</p>
+    </div>
+</div>
+</section>
+
+ <!-- TIMINGS -->
+
+<section id="hours" class="py-24 bg-[#050505] text-white relative overflow-hidden border-t border-white/5">
+    
+    <div id="glow-bg" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[150px] opacity-20 transition-colors duration-1000 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            
+            <div class="reveal-left">
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-red-600 mb-4">Availability</h2>
+                <h3 class="text-5xl md:text-7xl font-black italic mb-8 uppercase">Office <br>Status</h3>
+                
+                <div id="status-card" class="relative inline-block p-[2px] rounded-[2.5rem] transition-all duration-1000">
+                    <div class="bg-neutral-900 rounded-[2.5rem] px-10 py-6 flex items-center gap-6 border border-white/10">
+                        <div class="relative flex h-5 w-5">
+                            <span id="ping-effect" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                            <span id="status-dot" class="relative inline-flex rounded-full h-5 w-5"></span>
+                        </div>
+                        
+                        <div>
+                            <span id="status-text" class="text-3xl font-black italic tracking-tighter uppercase block">Loading...</span>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Live Shop Checker</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mt-8 text-gray-400 font-medium">
+                    Our current time is <span id="current-time" class="text-white font-bold">00:00 AM</span>. 
+                    <br><span class="text-sm opacity-50">Based on IST (India Standard Time)</span>
+                </p>
+            </div>
+
+            <div class="reveal-right">
+                <div class="grid gap-4">
+                    <div class="group bg-white/5 border border-white/10 p-8 rounded-[2rem] hover:bg-white/10 transition-all">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-red-600 font-black text-xs uppercase tracking-widest mb-1">Weekdays</p>
+                                <h4 class="text-2xl font-bold">Mon — Sat</h4>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-black italic">10:00 AM</p>
+                                <p class="text-gray-500 font-bold uppercase text-[10px]">To 06:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group bg-white/5 border border-white/10 p-8 rounded-[2rem] opacity-60 hover:opacity-100 transition-all">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500 font-black text-xs uppercase tracking-widest mb-1">Weekend</p>
+                                <h4 class="text-2xl font-bold">Sunday</h4>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-black italic text-red-600 uppercase">Closed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+    <!-- Footer -->
+    <footer class="py-20 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <img src="images\logo.png" alt="MSAFE" class="h-10 mx-auto mb-10 brightness-50 hover:brightness-100 transition duration-700">
+            <p class="text-gray-600 text-sm font-medium tracking-wide mb-8">ENGINEERING THE FLOW OF THE FUTURE.</p>
+            <div class="flex justify-center gap-10 text-gray-500 mb-10">
+                <a href="https://www.instagram.com/msafeindustries/" class="hover:text-red-600 transition"><i class="fab fa-instagram text-xl"></i></a>
+                <a href="https://wa.me/919037627335" class="hover:text-red-600 transition"><i class="fab fa-whatsapp text-xl"></i></a>
+                <a href="https://www.facebook.com/msafeindustries/" class="hover:text-red-600 transition"><i class="fab fa-facebook text-xl"></i></a>
+                <a href="tel:+919037627335" class="hover:text-red-600 transition"><i class="fa-solid fa-phone"></i></a>
+
+            </div>
+            <p class="text-[10px] text-gray-700 font-bold uppercase tracking-[0.4em]">&copy; 2026 MSAFE INDUSTRIES | AQUARUN </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth Cursor/Gradient Follow
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.documentElement.style.setProperty('--mouse-x', `${x}%`);
+            document.documentElement.style.setProperty('--mouse-y', `${y}%`);
+        });
+
+        // Intersection Observer for Scroll Animations
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => scrollObserver.observe(el));
+
+        // Parallax Effect for Product Image
+        window.addEventListener('scroll', () => {
+            const product = document.querySelector('.floating-product');
+            const scrolled = window.pageYOffset;
+            if (product) {
+                product.style.transform = `translateY(${scrolled * 0.05}px)`;
+            }
+        });
+
+        // Nav Scroll Styling
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('py-2', 'shadow-2xl');
+                nav.classList.remove('py-4');
+            } else {
+                nav.classList.add('py-4');
+                nav.classList.remove('py-2', 'shadow-2xl');
+            }
+        });
+        window.addEventListener('DOMContentLoaded', () => {
+    const preloader = document.getElementById('preloader');
+    const loaderBar = document.getElementById('loader-bar');
+
+    // Start filling the bar immediately
+    setTimeout(() => {
+        loaderBar.style.width = '100%';
+    }, 50);
+
+    // Hide the screen after exactly 2 seconds
+    setTimeout(() => {
+        preloader.classList.add('fade-out');
+        // Re-enable scrolling once loaded
+        document.body.style.overflow = 'auto';
+    }, 2000);
+});
+
+// Lock scroll while loading
+document.body.style.overflow = 'hidden';
+// Force scroll to top on refresh
+window.onbeforeunload = function () {
+    window.scrollTo(0, 0);
+};
+
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+window.addEventListener('load', () => {
+    window.scrollTo(0, 0);
+});
+    </script>
+</body>
+
+</html>
